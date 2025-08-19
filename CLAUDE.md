@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Nixtio** is an AI-powered productivity Flutter application that provides document scanning, editing, file conversion, and AI assistance capabilities. The app features a clean, modern interface with four main functional areas accessible from a central dashboard.
+**LuminAI** is an AI-powered productivity Flutter application that provides document scanning, editing, file conversion, and AI assistance capabilities. The app features a clean, modern interface with four main functional areas accessible from a central dashboard.
 The complete plan for the project has been written to @plan.md
 
 
@@ -56,7 +56,7 @@ The complete plan for the project has been written to @plan.md
 
 ## Project Architecture
 
-Nixtio follows clean architecture principles with Riverpod for state management and Supabase for backend services:
+LuminAI follows clean architecture principles with Riverpod for state management and Supabase for backend services:
 
 ### State Management - Riverpod
 - Uses `flutter_riverpod: ^2.6.1` for reactive state management

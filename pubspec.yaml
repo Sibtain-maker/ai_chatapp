@@ -1,5 +1,5 @@
 name: ai_chatapp
-description: "A new Flutter project."
+description: "LuminAI - An AI-powered productivity app for document scanning, editing, file conversion, and AI assistance."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev

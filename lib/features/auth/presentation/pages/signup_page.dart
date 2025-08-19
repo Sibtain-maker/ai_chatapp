@@ -75,7 +75,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                 children: [
                   const SizedBox(height: 32),
                   Text(
-                    'Join Nixtio',
+                    'Join LuminAI',
                     style: Theme.of(context).textTheme.displayMedium,
                     textAlign: TextAlign.center,
                   ),

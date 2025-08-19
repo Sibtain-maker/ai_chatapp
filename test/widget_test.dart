@@ -15,12 +15,12 @@ void main() {
     // Build our app and trigger a frame.
     await tester.pumpWidget(
       const ProviderScope(
-        child: NixtioApp(),
+        child: LuminAIApp(),
       ),
     );
 
     // Verify that our app shows the greeting text.
-    expect(find.text('Hi Nixtio, How can I help you today?'), findsOneWidget);
+    expect(find.text('Hi there, How can I help you today?'), findsOneWidget);
     
     // Verify that the feature cards are present.
     expect(find.text('Scan'), findsOneWidget);

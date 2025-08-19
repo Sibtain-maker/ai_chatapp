@@ -14,19 +14,146 @@ class HomePage extends ConsumerWidget {
     return 'Hi there, How can I help you today?';
   }
 
+  void _handleSettingsAction(BuildContext context, WidgetRef ref, String action) {
+    switch (action) {
+      case 'profile':
+        _showProfileDialog(context, ref);
+        break;
+      case 'theme':
+        _showThemeDialog(context);
+        break;
+      case 'about':
+        _showAboutDialog(context);
+        break;
+      case 'logout':
+        _showLogoutConfirmation(context, ref);
+        break;
+    }
+  }
+
+  void _showProfileDialog(BuildContext context, WidgetRef ref) {
+    final user = ref.read(authProvider).user;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Profile'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Name: ${user?.name ?? 'Not provided'}'),
+            const SizedBox(height: 8),
+            Text('Email: ${user?.email ?? 'Not available'}'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showThemeDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Theme'),
+        content: const Text('Theme settings will be available in future updates.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAboutDialog(BuildContext context) {
+    showAboutDialog(
+      context: context,
+      applicationName: 'LuminAI',
+      applicationVersion: '1.0.0',
+      applicationIcon: const Icon(Icons.apps, size: 32),
+      children: [
+        const Text('An AI-powered productivity app for document scanning, editing, file conversion, and AI assistance.'),
+      ],
+    );
+  }
+
+  void _showLogoutConfirmation(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              ref.read(authProvider.notifier).signOut();
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Logout'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
     final user = authState.user;
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.help_outline),
-          onPressed: () {
-            // TODO: Navigate to help page
-          },
+        leading: PopupMenuButton<String>(
+          icon: const Icon(Icons.settings),
+          onSelected: (value) => _handleSettingsAction(context, ref, value),
+          itemBuilder: (context) => [
+            const PopupMenuItem(
+              value: 'profile',
+              child: ListTile(
+                leading: Icon(Icons.person_outline),
+                title: Text('Profile'),
+                contentPadding: EdgeInsets.zero,
+              ),
+            ),
+            const PopupMenuItem(
+              value: 'theme',
+              child: ListTile(
+                leading: Icon(Icons.palette_outlined),
+                title: Text('Theme'),
+                contentPadding: EdgeInsets.zero,
+              ),
+            ),
+            const PopupMenuItem(
+              value: 'about',
+              child: ListTile(
+                leading: Icon(Icons.info_outline),
+                title: Text('About'),
+                contentPadding: EdgeInsets.zero,
+              ),
+            ),
+            const PopupMenuDivider(),
+            const PopupMenuItem(
+              value: 'logout',
+              child: ListTile(
+                leading: Icon(Icons.logout, color: Colors.red),
+                title: Text('Logout', style: TextStyle(color: Colors.red)),
+                contentPadding: EdgeInsets.zero,
+              ),
+            ),
+          ],
         ),
-        title: const Text('Nixtio'),
+        title: Text(user?.name ?? 'LuminAI'),
         actions: [
           Stack(
             children: [

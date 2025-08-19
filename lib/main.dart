@@ -14,7 +14,7 @@ Future<void> main() async {
   
   runApp(
     ProviderScope(
-      child: NixtioApp(),
+      child: LuminAIApp(),
     ),
   );
 }

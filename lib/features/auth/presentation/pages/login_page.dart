@@ -66,7 +66,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               children: [
                 const SizedBox(height: 32),
                 Text(
-                  'Sign in to Nixtio',
+                  'Sign in to LuminAI',
                   style: Theme.of(context).textTheme.displayMedium,
                   textAlign: TextAlign.center,
                 ),
