@@ -62,12 +62,97 @@
 
 ---
 
-## Student-Focused Feature Brainstorming
+## Smart Class Schedule Feature
 
-**Replacing Editor with:** 🎓 University Student Helper Features
+**Replacing Editor with:** 📅 Smart University Class Schedule Manager
 
-### Student Feature Ideas:
+### Feature Concept:
 
-*[Student-specific enhancement ideas will be captured here]*
+**🎯 Core Feature: Scan University Timetable → Auto-Create Smart Schedule**
+
+**How It Works:**
+- Scan university-provided class schedule (like BSSE-II-A timetable)
+- AI automatically extracts all class information
+- Creates digital schedule with smart notifications
+- Integrates with phone calendar and reminders
+
+**Key Information Extracted:**
+- Course names (Object Oriented Programming, Database Systems, etc.)
+- Time slots (08:00-09:20, 09:20-10:40, etc.)
+- Days of the week (Monday, Tuesday, Wednesday, etc.)
+- Room numbers (CT-401, CT-402, etc.)
+- Professor names (CT-Mr. Zain Abubaker, etc.)
+- Course codes (CT-404, CT-405, etc.)
+
+**Smart Features:**
+- **Class Time Notifications:** "Database Systems class in 15 minutes - Room CT-401"
+- **Schedule Conflicts:** Detect and alert about overlapping classes
+- **Professor Names:** Display professor for each class (CT-Mr. Zain Abubaker)
+
+**Manual Options:**
+- Add classes manually if scanning doesn't work perfectly
+- Edit extracted information easily
+- Add personal study time and breaks
+- Customize notification timing preferences
+
+---
+
+## Converter Feature Brainstorming
+
+**Focus Area:** 🔄 File Format Converter - Transform documents between multiple formats
+
+### Ideas Generated:
+
+**🎯 Simple Format Converter**
+
+**Core Feature:**
+- Select image/document from phone gallery or files section
+- Convert to 3 formats: PDF, JPEG, PNG
+- Auto-save to correct location
+
+**Smart Save Logic:**
+- **PDF** → Saves to Files section
+- **JPEG** → Saves to Phone Gallery  
+- **PNG** → Saves to Phone Gallery
+
+**Simple Process:**
+1. Choose source (Gallery or Files)
+2. Select format (PDF/JPEG/PNG)
+3. Convert
+4. Auto-saves to appropriate location
+
+---
+
+## AI Chat Feature Brainstorming
+
+**Focus Area:** 🤖 AI Chat Assistant - Works like ChatGPT with image support
+
+### Ideas Generated:
+
+**🎯 ChatGPT-Style AI with Image Support**
+
+**Core Features:**
+- Text-based chat interface like ChatGPT
+- **Image Upload Support** - Attach pictures to ask questions
+- AI can analyze and understand images
+- Conversational AI that understands context
+
+**How Image Support Works:**
+- User types question + attaches image
+- AI analyzes the image and responds
+- Examples: "What's in this document?" or "Explain this diagram"
+- Support for photos, screenshots, scanned documents
+
+**Simple Interface:**
+- Chat bubbles (user vs AI)
+- Attachment button for images
+- Text input box
+- Send button
+
+**Use Cases:**
+- Upload homework photo: "Help me solve this math problem"
+- Upload document: "Summarize this text"
+- Upload schedule: "When is my next class?"
+- Upload diagram: "Explain this flowchart"
 
 ---
