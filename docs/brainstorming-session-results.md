@@ -2,7 +2,7 @@
 
 **Session Topic:** Feature Enhancement for LuminAI Core Features
 **Date:** August 20, 2025
-**Focus:** 📄 Scanner, ✏️ Editor, 🔄 Converter, 🤖 AI Chat
+**Focus:** 📄 Scanner, 📅 Smart Class Schedule, 🔄 Converter, 🤖 AI Chat
 
 ---
 
