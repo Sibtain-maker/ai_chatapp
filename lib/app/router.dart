@@ -5,6 +5,7 @@ import '../features/home/presentation/pages/home_page.dart';
 import '../features/auth/presentation/pages/login_page.dart';
 import '../features/auth/presentation/pages/signup_page.dart';
 import '../features/auth/presentation/pages/forgot_password_page.dart';
+import '../features/scanner/presentation/pages/scanner_page.dart';
 import '../features/auth/providers/auth_provider.dart';
 
 class AuthNotifierWrapper extends ChangeNotifier {
@@ -61,7 +62,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: 'forgot-password',
         builder: (context, state) => const ForgotPasswordPage(),
       ),
-      // TODO: Add routes for scanner, editor, converter, ai_chat
+      GoRoute(
+        path: '/scanner',
+        name: 'scanner',
+        builder: (context, state) => const ScannerPage(),
+      ),
+      // TODO: Add routes for editor, converter, ai_chat
     ],
     errorBuilder: (context, state) => Scaffold(
       body: Center(

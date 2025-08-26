@@ -57,7 +57,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         centerTitle: true,
       ),
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
           child: Form(
             key: _formKey,
@@ -147,7 +147,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   },
                   child: const Text('Forgot Password?'),
                 ),
-                const Spacer(),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.1),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -160,6 +160,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 24),
               ],
             ),
           ),

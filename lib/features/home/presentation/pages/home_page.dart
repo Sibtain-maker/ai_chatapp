@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../auth/providers/auth_provider.dart';
 
 class HomePage extends ConsumerWidget {
@@ -210,9 +211,7 @@ class HomePage extends ConsumerWidget {
                     icon: Icons.document_scanner,
                     title: 'Scan',
                     subtitle: 'Documents & ID cards',
-                    onTap: () {
-                      // TODO: Navigate to scanner
-                    },
+                    onTap: () => context.push('/scanner'),
                   ),
                   _FeatureCard(
                     icon: Icons.edit,
