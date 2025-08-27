@@ -146,7 +146,7 @@ class _ScannerPageState extends ConsumerState<ScannerPage>
         onRetake: () => Navigator.of(context).pop(),
         onSave: () {
           Navigator.of(context).pop();
-          _saveDocument(imagePath);
+          _saveEnhancedDocument(imagePath);
         },
       ),
     );
@@ -167,6 +167,8 @@ class _ScannerPageState extends ConsumerState<ScannerPage>
       await scannerService.saveScannedDocument(
         imageFile: imageFile,
         userId: user.id,
+        enableAIEnhancement: false, // Save original without enhancement
+        enableOcrExtraction: false, // Save original without OCR
       );
 
       if (mounted) {
@@ -182,6 +184,61 @@ class _ScannerPageState extends ConsumerState<ScannerPage>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to save document: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _saveEnhancedDocument(String originalImagePath) async {
+    try {
+      print('🔍 DEBUG: Starting enhanced document save process');
+      print('🔍 DEBUG: Original image path: $originalImagePath');
+      
+      final authState = ref.read(authProvider);
+      final user = authState.user;
+      
+      if (user == null) {
+        print('❌ DEBUG: User not authenticated');
+        throw Exception('User not authenticated');
+      }
+      
+      print('✅ DEBUG: User authenticated: ${user.id}');
+
+      final scannerService = ref.read(scannerServiceProvider);
+      final imageFile = File(originalImagePath);
+      
+      print('✅ DEBUG: File exists: ${await imageFile.exists()}');
+      print('🔍 DEBUG: Starting scanner service save...');
+      
+      // Save with AI enhancement and OCR enabled (Stories 2 & 3)
+      final result = await scannerService.saveScannedDocument(
+        imageFile: imageFile,
+        userId: user.id,
+        enableAIEnhancement: true,
+        enableOcrExtraction: true,
+      );
+      
+      print('✅ DEBUG: Document saved successfully! ID: ${result.id}');
+      print('✅ DEBUG: Has OCR text: ${result.hasOcrText}');
+      print('✅ DEBUG: Is enhanced: ${result.isEnhanced}');
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Enhanced document with OCR saved successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      print('❌ DEBUG: Error in _saveEnhancedDocument: $e');
+      print('❌ DEBUG: Error type: ${e.runtimeType}');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to save enhanced document: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );

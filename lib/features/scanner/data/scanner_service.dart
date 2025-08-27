@@ -25,6 +25,11 @@ class ScannerService {
     bool enableOcrExtraction = true,
   }) async {
     try {
+      print('🔧 SCANNER SERVICE: Starting document save process');
+      print('🔧 SCANNER SERVICE: Input file: ${imageFile.path}');
+      print('🔧 SCANNER SERVICE: AI Enhancement: $enableAIEnhancement');
+      print('🔧 SCANNER SERVICE: OCR Extraction: $enableOcrExtraction');
+      
       File finalImageFile = imageFile;
       EnhancementMetadata? enhancementMetadata;
       String? extractedText;
@@ -96,17 +101,26 @@ class ScannerService {
       );
 
       // Save to database
+      print('🔧 SCANNER SERVICE: Saving document to database...');
+      print('🔧 SCANNER SERVICE: Document JSON: ${document.toJson()}');
+      
       await _supabase
           .from('documents')
           .insert(document.toJson());
+          
+      print('✅ SCANNER SERVICE: Document saved to database successfully!');
 
       // Cleanup temporary enhanced file if different from original
       if (enableAIEnhancement && finalImageFile.path != imageFile.path) {
+        print('🔧 SCANNER SERVICE: Cleaning up temporary file: ${finalImageFile.path}');
         await _aiEnhancementService.cleanupTempFile(finalImageFile);
       }
 
+      print('✅ SCANNER SERVICE: Complete! Returning document with ID: ${document.id}');
       return document;
     } catch (e) {
+      print('❌ SCANNER SERVICE ERROR: $e');
+      print('❌ SCANNER SERVICE ERROR TYPE: ${e.runtimeType}');
       throw Exception('Failed to save scanned document: $e');
     }
   }
