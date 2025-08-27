@@ -9,6 +9,10 @@ class DocumentModel {
   final bool isEnhanced;
   final Map<String, dynamic>? enhancementMetadata;
   final String? originalFilePath;
+  final String? extractedText;
+  final bool hasOcrText;
+  final double? ocrConfidence;
+  final Map<String, dynamic>? ocrMetadata;
 
   const DocumentModel({
     required this.id,
@@ -21,6 +25,10 @@ class DocumentModel {
     this.isEnhanced = false,
     this.enhancementMetadata,
     this.originalFilePath,
+    this.extractedText,
+    this.hasOcrText = false,
+    this.ocrConfidence,
+    this.ocrMetadata,
   });
 
   factory DocumentModel.fromJson(Map<String, dynamic> json) {
@@ -35,6 +43,10 @@ class DocumentModel {
       isEnhanced: json['is_enhanced'] as bool? ?? false,
       enhancementMetadata: json['enhancement_metadata'] as Map<String, dynamic>?,
       originalFilePath: json['original_file_path'] as String?,
+      extractedText: json['extracted_text'] as String?,
+      hasOcrText: json['has_ocr_text'] as bool? ?? false,
+      ocrConfidence: (json['ocr_confidence'] as num?)?.toDouble(),
+      ocrMetadata: json['ocr_metadata'] as Map<String, dynamic>?,
     );
   }
 
@@ -50,6 +62,10 @@ class DocumentModel {
       'is_enhanced': isEnhanced,
       'enhancement_metadata': enhancementMetadata,
       'original_file_path': originalFilePath,
+      'extracted_text': extractedText,
+      'has_ocr_text': hasOcrText,
+      'ocr_confidence': ocrConfidence,
+      'ocr_metadata': ocrMetadata,
     };
   }
 
@@ -64,6 +80,10 @@ class DocumentModel {
     bool? isEnhanced,
     Map<String, dynamic>? enhancementMetadata,
     String? originalFilePath,
+    String? extractedText,
+    bool? hasOcrText,
+    double? ocrConfidence,
+    Map<String, dynamic>? ocrMetadata,
   }) {
     return DocumentModel(
       id: id ?? this.id,
@@ -76,6 +96,10 @@ class DocumentModel {
       isEnhanced: isEnhanced ?? this.isEnhanced,
       enhancementMetadata: enhancementMetadata ?? this.enhancementMetadata,
       originalFilePath: originalFilePath ?? this.originalFilePath,
+      extractedText: extractedText ?? this.extractedText,
+      hasOcrText: hasOcrText ?? this.hasOcrText,
+      ocrConfidence: ocrConfidence ?? this.ocrConfidence,
+      ocrMetadata: ocrMetadata ?? this.ocrMetadata,
     );
   }
 }

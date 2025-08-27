@@ -6,24 +6,30 @@ import '../../../core/services/storage_service.dart';
 import '../../../core/models/document_model.dart';
 import '../../../shared/providers/supabase_provider.dart';
 import 'ai_enhancement_service.dart';
+import 'ocr_service.dart';
 
 class ScannerService {
   final StorageService _storageService;
   final SupabaseClient _supabase;
   final AIEnhancementService _aiEnhancementService;
+  final OcrService _ocrService;
   final Uuid _uuid = const Uuid();
 
-  ScannerService(this._storageService, this._supabase, this._aiEnhancementService);
+  ScannerService(this._storageService, this._supabase, this._aiEnhancementService, this._ocrService);
 
   Future<DocumentModel> saveScannedDocument({
     required File imageFile,
     required String userId,
     String? title,
     bool enableAIEnhancement = true,
+    bool enableOcrExtraction = true,
   }) async {
     try {
       File finalImageFile = imageFile;
       EnhancementMetadata? enhancementMetadata;
+      String? extractedText;
+      double? ocrConfidence;
+      Map<String, dynamic>? ocrMetadata;
       
       // Apply AI enhancement if enabled
       if (enableAIEnhancement) {
@@ -38,6 +44,20 @@ class ScannerService {
         // Cleanup original if it was replaced
         if (finalImageFile.path != imageFile.path) {
           // Keep original for comparison, cleanup will happen later
+        }
+      }
+      
+      // Apply OCR text extraction after enhancement
+      if (enableOcrExtraction) {
+        final ocrResult = await _ocrService.extractTextFromImage(
+          imageFile: finalImageFile,
+        );
+        
+        // Only store text if OCR meets accuracy requirements
+        if (ocrResult.meetsAccuracyRequirement) {
+          extractedText = ocrResult.extractedText;
+          ocrConfidence = ocrResult.confidence;
+          ocrMetadata = ocrResult.toJson();
         }
       }
       
@@ -69,6 +89,10 @@ class ScannerService {
         isEnhanced: enableAIEnhancement && enhancementMetadata != null,
         enhancementMetadata: enhancementMetadata?.toJson(),
         originalFilePath: enableAIEnhancement ? imageFile.path : null,
+        extractedText: extractedText,
+        hasOcrText: extractedText != null,
+        ocrConfidence: ocrConfidence,
+        ocrMetadata: ocrMetadata,
       );
 
       // Save to database
@@ -138,5 +162,6 @@ final scannerServiceProvider = Provider<ScannerService>((ref) {
   final storageService = ref.watch(storageServiceProvider);
   final supabase = ref.watch(supabaseClientProvider);
   final aiEnhancementService = ref.watch(aiEnhancementServiceProvider);
-  return ScannerService(storageService, supabase, aiEnhancementService);
+  final ocrService = ref.watch(ocrServiceProvider);
+  return ScannerService(storageService, supabase, aiEnhancementService, ocrService);
 });

@@ -100,9 +100,13 @@ class _EnhancedPreviewDialogState extends ConsumerState<EnhancedPreviewDialog> {
   @override
   void dispose() {
     // Cleanup temporary files when dialog is disposed
-    if (_enhancementResult != null) {
-      ref.read(aiEnhancementServiceProvider)
-          .cleanupTempFile(_enhancementResult!.enhancedFile);
+    if (mounted && _enhancementResult != null) {
+      try {
+        ref.read(aiEnhancementServiceProvider)
+            .cleanupTempFile(_enhancementResult!.enhancedFile);
+      } catch (e) {
+        // Ignore cleanup errors during disposal
+      }
     }
     super.dispose();
   }
