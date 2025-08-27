@@ -72,9 +72,12 @@ void main() {
       expect(
         find.byType(CircularProgressIndicator).evaluate().isNotEmpty || 
         find.text('Choose from Gallery').evaluate().isNotEmpty ||
-        find.text('Try Camera Again').evaluate().isNotEmpty,
+        find.text('Try Camera').evaluate().isNotEmpty,
         isTrue,
       );
+      
+      // Pump and settle to allow any pending timers to complete
+      await tester.pumpAndSettle(const Duration(seconds: 2));
     });
   });
 

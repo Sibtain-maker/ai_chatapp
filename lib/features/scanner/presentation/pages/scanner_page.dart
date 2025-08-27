@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../data/scanner_service.dart';
 import '../../../auth/providers/auth_provider.dart';
+import '../widgets/enhanced_preview_dialog.dart';
 
 class ScannerPage extends ConsumerStatefulWidget {
   const ScannerPage({super.key});
@@ -20,6 +21,7 @@ class _ScannerPageState extends ConsumerState<ScannerPage>
   bool _isFlashOn = false;
   final ImagePicker _imagePicker = ImagePicker();
   String? _permissionError;
+  bool _isInitializing = true;
 
   @override
   void initState() {
@@ -50,10 +52,17 @@ class _ScannerPageState extends ConsumerState<ScannerPage>
 
   Future<void> _initializeCamera() async {
     try {
-      final cameras = await availableCameras();
+      // Add timeout to prevent indefinite loading
+      final cameras = await availableCameras().timeout(
+        const Duration(seconds: 10),
+        onTimeout: () => throw Exception('Camera initialization timeout'),
+      );
+      
       if (cameras.isEmpty) {
         setState(() {
           _permissionError = 'No cameras available on this device';
+          _isCameraInitialized = false;
+          _isInitializing = false;
         });
         return;
       }
@@ -61,23 +70,29 @@ class _ScannerPageState extends ConsumerState<ScannerPage>
       final camera = cameras.first;
       _cameraController = CameraController(
         camera,
-        ResolutionPreset.high,
+        ResolutionPreset.medium,
         enableAudio: false,
       );
 
-      await _cameraController!.initialize();
+      await _cameraController!.initialize().timeout(
+        const Duration(seconds: 10),
+        onTimeout: () => throw Exception('Camera initialization timeout'),
+      );
       
       if (mounted) {
         setState(() {
           _isCameraInitialized = true;
           _permissionError = null;
+          _isInitializing = false;
         });
       }
     } catch (e) {
+      debugPrint('Camera initialization error: $e');
       if (mounted) {
         setState(() {
-          _permissionError = 'Failed to initialize camera: ${e.toString()}';
+          _permissionError = 'Camera permission needed. Please allow camera access and try again.';
           _isCameraInitialized = false;
+          _isInitializing = false;
         });
       }
     }
@@ -125,49 +140,14 @@ class _ScannerPageState extends ConsumerState<ScannerPage>
   void _showImagePreview(String imagePath) {
     showDialog(
       context: context,
-      builder: (context) => Dialog(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            AppBar(
-              title: const Text('Preview'),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    _saveDocument(imagePath);
-                  },
-                  child: const Text('Save', style: TextStyle(color: Colors.white)),
-                ),
-              ],
-            ),
-            Flexible(
-              child: Image.file(
-                File(imagePath),
-                fit: BoxFit.contain,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Retake'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      _saveDocument(imagePath);
-                    },
-                    child: const Text('Use Photo'),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+      barrierDismissible: false, // Prevent dismissing during processing
+      builder: (context) => EnhancedPreviewDialog(
+        originalImagePath: imagePath,
+        onRetake: () => Navigator.of(context).pop(),
+        onSave: () {
+          Navigator.of(context).pop();
+          _saveDocument(imagePath);
+        },
       ),
     );
   }
@@ -232,9 +212,33 @@ class _ScannerPageState extends ConsumerState<ScannerPage>
       return _buildPermissionError();
     }
 
-    if (!_isCameraInitialized || _cameraController == null) {
-      return const Center(
-        child: CircularProgressIndicator(),
+    if (_isInitializing && (!_isCameraInitialized || _cameraController == null)) {
+      return Container(
+        color: Colors.black,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Initializing Camera...',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'This may take a few seconds',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Colors.white70,
+                ),
+              ),
+            ],
+          ),
+        ),
       );
     }
 
@@ -287,34 +291,70 @@ class _ScannerPageState extends ConsumerState<ScannerPage>
   }
 
   Widget _buildPermissionError() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.camera_alt_outlined,
-              size: 64,
-              color: Colors.grey,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              _permissionError!,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: _pickFromGallery,
-              child: const Text('Choose from Gallery'),
-            ),
-            const SizedBox(height: 12),
-            TextButton(
-              onPressed: _initializeCamera,
-              child: const Text('Try Camera Again'),
-            ),
-          ],
+    return Container(
+      color: Colors.black,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.photo_library_outlined,
+                size: 80,
+                color: Colors.white70,
+              ),
+              const SizedBox(height: 24),
+              Text(
+                _permissionError!,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: Colors.white,
+                  fontSize: 18,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Allow camera permission in Settings or use Gallery to select photos',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Colors.white70,
+                ),
+              ),
+              const SizedBox(height: 32),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: _pickFromGallery,
+                  icon: const Icon(Icons.photo_library),
+                  label: const Text('Choose from Gallery'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    textStyle: const TextStyle(fontSize: 16),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              OutlinedButton.icon(
+                onPressed: () {
+                  setState(() {
+                    _isInitializing = true;
+                    _permissionError = null;
+                  });
+                  _initializeCamera();
+                },
+                icon: const Icon(Icons.camera_alt),
+                label: const Text('Try Camera'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white70,
+                  side: const BorderSide(color: Colors.white70),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

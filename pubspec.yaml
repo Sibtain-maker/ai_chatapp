@@ -46,6 +46,8 @@ dependencies:
   pdf: ^3.10.8
   file_picker: ^8.0.0+1
   path_provider: ^2.1.2
+  image: ^4.1.7  # Image manipulation and processing
+  http: ^1.2.0   # HTTP client for AI service calls
   
   # Voice & Speech
   speech_to_text: ^6.6.2

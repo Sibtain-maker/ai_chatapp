@@ -24,6 +24,37 @@ void main() {
         expect(document.fileType, equals('JPG'));
         expect(document.fileSize, equals(1024));
         expect(document.createdAt, equals(DateTime(2023, 1, 1)));
+        expect(document.isEnhanced, equals(false));
+        expect(document.enhancementMetadata, isNull);
+        expect(document.originalFilePath, isNull);
+      });
+
+      test('creates enhanced document model with metadata', () {
+        // Arrange
+        final enhancementMetadata = {
+          'algorithm': 'AI_HYBRID_V1',
+          'quality_score': 135.5,
+          'processing_date': '2023-01-01T00:00:00.000Z',
+        };
+        
+        // Act
+        final document = DocumentModel(
+          id: 'test-id',
+          userId: 'user-123',
+          title: 'Enhanced Test Document',
+          filePath: 'documents/user-123/enhanced_test.jpg',
+          fileType: 'JPG',
+          fileSize: 2048,
+          createdAt: DateTime(2023, 1, 1),
+          isEnhanced: true,
+          enhancementMetadata: enhancementMetadata,
+          originalFilePath: 'temp/original_test.jpg',
+        );
+
+        // Assert
+        expect(document.isEnhanced, equals(true));
+        expect(document.enhancementMetadata, equals(enhancementMetadata));
+        expect(document.originalFilePath, equals('temp/original_test.jpg'));
       });
 
       test('converts from JSON correctly', () {
@@ -36,6 +67,12 @@ void main() {
           'file_type': 'JPG',
           'file_size': 1024,
           'created_at': '2023-01-01T00:00:00.000Z',
+          'is_enhanced': true,
+          'enhancement_metadata': {
+            'algorithm': 'AI_HYBRID_V1',
+            'quality_score': 135.5,
+          },
+          'original_file_path': 'temp/original.jpg',
         };
 
         // Act
@@ -48,6 +85,10 @@ void main() {
         expect(document.filePath, equals('documents/user-123/test.jpg'));
         expect(document.fileType, equals('JPG'));
         expect(document.fileSize, equals(1024));
+        expect(document.isEnhanced, equals(true));
+        expect(document.enhancementMetadata!['algorithm'], equals('AI_HYBRID_V1'));
+        expect(document.enhancementMetadata!['quality_score'], equals(135.5));
+        expect(document.originalFilePath, equals('temp/original.jpg'));
       });
 
       test('converts to JSON correctly', () {

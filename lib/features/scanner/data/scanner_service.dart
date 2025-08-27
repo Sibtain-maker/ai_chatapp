@@ -5,31 +5,53 @@ import 'package:uuid/uuid.dart';
 import '../../../core/services/storage_service.dart';
 import '../../../core/models/document_model.dart';
 import '../../../shared/providers/supabase_provider.dart';
+import 'ai_enhancement_service.dart';
 
 class ScannerService {
   final StorageService _storageService;
   final SupabaseClient _supabase;
+  final AIEnhancementService _aiEnhancementService;
   final Uuid _uuid = const Uuid();
 
-  ScannerService(this._storageService, this._supabase);
+  ScannerService(this._storageService, this._supabase, this._aiEnhancementService);
 
   Future<DocumentModel> saveScannedDocument({
     required File imageFile,
     required String userId,
     String? title,
+    bool enableAIEnhancement = true,
   }) async {
     try {
+      File finalImageFile = imageFile;
+      EnhancementMetadata? enhancementMetadata;
+      
+      // Apply AI enhancement if enabled
+      if (enableAIEnhancement) {
+        final enhancementResult = await _aiEnhancementService.enhanceDocument(
+          originalFile: imageFile,
+          userId: userId,
+        );
+        
+        finalImageFile = enhancementResult.enhancedFile;
+        enhancementMetadata = enhancementResult.enhancementMetadata;
+        
+        // Cleanup original if it was replaced
+        if (finalImageFile.path != imageFile.path) {
+          // Keep original for comparison, cleanup will happen later
+        }
+      }
+      
       // Generate unique filename
       final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final extension = imageFile.path.split('.').last;
+      final extension = finalImageFile.path.split('.').last;
       final fileName = 'scan_$timestamp.$extension';
       
       // Get file size
-      final fileSize = await imageFile.length();
+      final fileSize = await finalImageFile.length();
       
-      // Upload to storage
+      // Upload enhanced image to storage
       final filePath = await _storageService.uploadDocument(
-        file: imageFile,
+        file: finalImageFile,
         fileName: fileName,
         userId: userId,
       );
@@ -39,17 +61,25 @@ class ScannerService {
       final document = DocumentModel(
         id: documentId,
         userId: userId,
-        title: title ?? 'Scanned Document ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
+        title: title ?? '${enableAIEnhancement ? 'Enhanced Document' : 'Scanned Document'} ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
         filePath: filePath,
         fileType: extension.toUpperCase(),
         fileSize: fileSize,
         createdAt: DateTime.now(),
+        isEnhanced: enableAIEnhancement && enhancementMetadata != null,
+        enhancementMetadata: enhancementMetadata?.toJson(),
+        originalFilePath: enableAIEnhancement ? imageFile.path : null,
       );
 
       // Save to database
       await _supabase
           .from('documents')
           .insert(document.toJson());
+
+      // Cleanup temporary enhanced file if different from original
+      if (enableAIEnhancement && finalImageFile.path != imageFile.path) {
+        await _aiEnhancementService.cleanupTempFile(finalImageFile);
+      }
 
       return document;
     } catch (e) {
@@ -91,10 +121,22 @@ class ScannerService {
   Future<String> getDocumentUrl(DocumentModel document) async {
     return _storageService.getDocumentUrl(document.filePath);
   }
+
+  /// Get enhancement result with before/after comparison
+  Future<EnhancementResult> getEnhancementPreview({
+    required File originalFile,
+    required String userId,
+  }) async {
+    return _aiEnhancementService.enhanceDocument(
+      originalFile: originalFile,
+      userId: userId,
+    );
+  }
 }
 
 final scannerServiceProvider = Provider<ScannerService>((ref) {
   final storageService = ref.watch(storageServiceProvider);
   final supabase = ref.watch(supabaseClientProvider);
-  return ScannerService(storageService, supabase);
+  final aiEnhancementService = ref.watch(aiEnhancementServiceProvider);
+  return ScannerService(storageService, supabase, aiEnhancementService);
 });

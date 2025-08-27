@@ -6,6 +6,9 @@ class DocumentModel {
   final String fileType;
   final int fileSize;
   final DateTime createdAt;
+  final bool isEnhanced;
+  final Map<String, dynamic>? enhancementMetadata;
+  final String? originalFilePath;
 
   const DocumentModel({
     required this.id,
@@ -15,6 +18,9 @@ class DocumentModel {
     required this.fileType,
     required this.fileSize,
     required this.createdAt,
+    this.isEnhanced = false,
+    this.enhancementMetadata,
+    this.originalFilePath,
   });
 
   factory DocumentModel.fromJson(Map<String, dynamic> json) {
@@ -26,6 +32,9 @@ class DocumentModel {
       fileType: json['file_type'] as String,
       fileSize: json['file_size'] as int,
       createdAt: DateTime.parse(json['created_at'] as String),
+      isEnhanced: json['is_enhanced'] as bool? ?? false,
+      enhancementMetadata: json['enhancement_metadata'] as Map<String, dynamic>?,
+      originalFilePath: json['original_file_path'] as String?,
     );
   }
 
@@ -38,6 +47,9 @@ class DocumentModel {
       'file_type': fileType,
       'file_size': fileSize,
       'created_at': createdAt.toIso8601String(),
+      'is_enhanced': isEnhanced,
+      'enhancement_metadata': enhancementMetadata,
+      'original_file_path': originalFilePath,
     };
   }
 
@@ -49,6 +61,9 @@ class DocumentModel {
     String? fileType,
     int? fileSize,
     DateTime? createdAt,
+    bool? isEnhanced,
+    Map<String, dynamic>? enhancementMetadata,
+    String? originalFilePath,
   }) {
     return DocumentModel(
       id: id ?? this.id,
@@ -58,6 +73,9 @@ class DocumentModel {
       fileType: fileType ?? this.fileType,
       fileSize: fileSize ?? this.fileSize,
       createdAt: createdAt ?? this.createdAt,
+      isEnhanced: isEnhanced ?? this.isEnhanced,
+      enhancementMetadata: enhancementMetadata ?? this.enhancementMetadata,
+      originalFilePath: originalFilePath ?? this.originalFilePath,
     );
   }
 }

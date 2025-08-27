@@ -69,7 +69,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
           padding: const EdgeInsets.all(24.0),
           child: Form(
             key: _formKey,
-              child: Column(
+            child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const SizedBox(height: 32),
@@ -204,8 +204,8 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                       ),
                     ],
                   ),
+                const SizedBox(height: 24),
                 ],
-              ),
             ),
           ),
         ),

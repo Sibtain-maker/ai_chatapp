@@ -54,11 +54,12 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
           title: const Text('Check Your Email'),
           centerTitle: true,
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              children: [
+                SizedBox(height: MediaQuery.of(context).size.height * 0.2),
               Icon(
                 Icons.mail_outlined,
                 size: 64,
@@ -83,7 +84,9 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                 },
                 child: const Text('Back to Login'),
               ),
+              const SizedBox(height: 24),
             ],
+            ),
           ),
         ),
       );
@@ -95,7 +98,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
         centerTitle: true,
       ),
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
           child: Form(
             key: _formKey,
@@ -154,6 +157,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                   },
                   child: const Text('Back to Login'),
                 ),
+                const SizedBox(height: 24),
               ],
             ),
           ),
